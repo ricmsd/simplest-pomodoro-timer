@@ -1,16 +1,23 @@
-const { app, BrowserWindow } = require('electron')
-const path = require('path')
+const { app, BrowserWindow } = require('electron');
+const path = require('path');
+const Store = require('electron-store');
+const store = new Store();
 
 const createWindow = () => {
     const win = new BrowserWindow({
-        width: 800,
-        height: 600,
+        width: store.get('browserWindow.width') || 800,
+        height: store.get('browserWindow.height') || 600,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
         },
         alwaysOnTop: true,
         opacity: 0.75
     })
+    win.on('resize', function() {
+        const size = win.getSize();
+        store.set('browserWindow.width', size[0]);
+        store.set('browserWindow.height', size[1]);
+    });
 
     win.setMenu(null);
     //win.loadFile('index.html')
